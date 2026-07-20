@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "coastal-gold",
+  "name": "金岸午后",
+  "image": "art.jpg",
+  "artFit": "cover",
+  "artPosition": "center",
+  "artFilter": "none",
+  "colors": {
+    "dim": "rgba(255, 255, 255, 0.22)",
+    "chrome": "rgba(248, 245, 242, 0.68)",
+    "sidebar": "rgba(246, 243, 238, 0.58)",
+    "editor": "rgba(251, 250, 248, 0.9)",
+    "aiPane": "rgba(248, 245, 242, 0.64)",
+    "input": "rgba(253, 253, 252, 0.9)",
+    "widget": "rgba(250, 248, 245, 0.96)",
+    "foreground": "#2b2317",
+    "mutedForeground": "rgba(43, 35, 23, 0.62)",
+    "accent": "#c67a10",
+    "line": "#c67a1040"
+  },
+  "mode": "light",
+  "builtin": true,
+  "hidden": false,
+  "custom": false
+}

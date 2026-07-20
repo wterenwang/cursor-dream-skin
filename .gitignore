@@ -1,0 +1,11 @@
+node_modules/
+.DS_Store
+*.log
+*.tmp
+.vscode/
+.idea/
+%LOCALAPPDATA%/
+themes/*/art.local.*
+*.zip
+CursorDreamSkin-portable*.zip
+scripts/_patch-*.mjs

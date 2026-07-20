@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "lantern-eve",
+  "name": "夏夜灯火",
+  "image": "art.jpg",
+  "artFit": "cover",
+  "artPosition": "center",
+  "artFilter": "none",
+  "colors": {
+    "dim": "rgba(4, 3, 10, 0.20)",
+    "chrome": "rgba(37, 18, 14, 0.72)",
+    "sidebar": "rgba(30, 15, 11, 0.55)",
+    "editor": "rgba(26, 13, 10, 0.88)",
+    "aiPane": "rgba(33, 16, 13, 0.70)",
+    "input": "rgba(59, 29, 22, 0.92)",
+    "widget": "rgba(44, 22, 17, 0.97)",
+    "foreground": "#f4f1ec",
+    "mutedForeground": "rgba(244, 241, 236, 0.72)",
+    "accent": "#f38b68",
+    "line": "#f38b6840"
+  },
+  "mode": "dark",
+  "builtin": true,
+  "hidden": false,
+  "custom": false
+}

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cursor Dream Skin</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="icon" href="/assets/dream-skin-icon.png" />
+</head>
+<body>
+  <div class="noise" aria-hidden="true"></div>
+  <div class="app">
+    <header class="hero">
+      <div class="hero-wash" aria-hidden="true"></div>
+      <div class="hero-top">
+        <p class="mark" data-i18n="mark">Dream Skin</p>
+        <div class="lang" role="group" aria-label="Language">
+          <button type="button" class="lang-btn" data-lang="en" id="btn-en">EN</button>
+          <button type="button" class="lang-btn is-active" data-lang="zh" id="btn-zh">中文</button>
+        </div>
+      </div>
+      <h1 class="brand" data-i18n="brand">Cursor Dream Skin</h1>
+      <p class="tagline" data-i18n="tagline">给每天写代码的地方，换一张更舒服的脸。</p>
+    </header>
+
+    <main class="main">
+      <section class="status" aria-labelledby="status-heading">
+        <div class="status-rail" id="status-rail" aria-hidden="true"></div>
+        <div class="status-body">
+          <p class="eyebrow" id="status-heading" data-i18n="status">状态</p>
+          <p class="status-line" id="status-text">...</p>
+          <p class="status-hint" id="status-hint"></p>
+          <ul class="checks" id="status-checks" aria-label="Lifecycle checks"></ul>
+          <dl class="meta">
+            <div>
+              <dt data-i18n="cursor">Cursor</dt>
+              <dd id="meta-cursor">-</dd>
+            </div>
+            <div>
+              <dt data-i18n="theme">主题</dt>
+              <dd id="meta-theme">-</dd>
+            </div>
+            <div>
+              <dt data-i18n="port">端口</dt>
+              <dd id="meta-port">-</dd>
+            </div>
+          </dl>
+          <div class="status-actions">
+            <button type="button" class="btn btn-ghost btn-compact" id="btn-change-cursor" data-i18n="changeCursor">更改 Cursor 路径</button>
+          </div>
+        </div>
+        <figure class="preview" id="preview">
+          <img id="preview-img" alt="" hidden />
+          <figcaption id="preview-cap" data-i18n="previewEmpty">选择主题以预览</figcaption>
+        </figure>
+      </section>
+
+      <section class="compose">
+        <label class="field">
+          <span data-i18n="theme">主题</span>
+          <select id="theme-select"></select>
+        </label>
+
+        <label class="check-row">
+          <input type="checkbox" id="chk-show-hidden" />
+          <span data-i18n="showHidden">显示演示 / 开发主题</span>
+        </label>
+
+        <div class="tune" id="theme-tune">
+          <p class="eyebrow" data-i18n="tuneTitle">主题微调</p>
+          <div class="tune-grid">
+            <label class="field">
+              <span data-i18n="tuneDim">暗角</span>
+              <input id="tune-dim" type="range" min="0" max="60" step="1" value="20" />
+              <output id="tune-dim-val">0.20</output>
+            </label>
+            <label class="field">
+              <span data-i18n="tuneEditor">编辑器不透明度</span>
+              <input id="tune-editor" type="range" min="50" max="100" step="1" value="90" />
+              <output id="tune-editor-val">0.90</output>
+            </label>
+            <label class="field">
+              <span data-i18n="tunePosition">背景位置</span>
+              <select id="tune-position">
+                <option value="center">center</option>
+                <option value="left">left</option>
+                <option value="right">right</option>
+                <option value="top">top</option>
+                <option value="bottom">bottom</option>
+                <option value="left top">left top</option>
+                <option value="left bottom">left bottom</option>
+                <option value="right top">right top</option>
+                <option value="right bottom">right bottom</option>
+                <option value="center top">center top</option>
+                <option value="center bottom">center bottom</option>
+              </select>
+            </label>
+          </div>
+          <div class="actions actions-2">
+            <button type="button" class="btn btn-primary" id="btn-save-tune" data-i18n="saveTune">保存微调</button>
+            <button type="button" class="btn btn-ghost" id="btn-delete-theme" data-i18n="deleteTheme">删除主题</button>
+          </div>
+        </div>
+
+        <label class="check-row">
+          <input type="checkbox" id="chk-pair-color" checked />
+          <span data-i18n="pairColor">应用后提示配对编辑器配色（不改 settings）</span>
+        </label>
+
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="btn-apply" data-i18n="apply">应用皮肤</button>
+          <button type="button" class="btn btn-ghost" id="btn-restore" data-i18n="restore">还原外观</button>
+          <button type="button" class="btn btn-ghost" id="btn-refresh" data-i18n="refresh">刷新状态</button>
+        </div>
+      </section>
+
+      <section class="compose custom" aria-labelledby="custom-heading">
+        <p class="eyebrow" id="custom-heading" data-i18n="customTitle">自定义主题</p>
+        <p class="custom-hint" data-i18n="customHint">导入一张壁纸（PNG / JPG / WEBP），配色会自动提取。</p>
+
+        <div class="custom-grid">
+          <label class="field">
+            <span data-i18n="customName">显示名称</span>
+            <input id="custom-name" type="text" maxlength="40" data-i18n-placeholder="customNamePh" placeholder="例如：海夜" />
+          </label>
+          <label class="field">
+            <span data-i18n="customMode">明暗</span>
+            <select id="custom-mode">
+              <option value="auto" data-i18n="modeAuto">自动</option>
+              <option value="dark" data-i18n="modeDark">深色</option>
+              <option value="light" data-i18n="modeLight">浅色</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="custom-file-row">
+          <input id="custom-file" type="file" accept="image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp" hidden />
+          <button type="button" class="btn btn-ghost" id="btn-pick" data-i18n="pickImage">选择图片</button>
+          <span class="file-name" id="file-name">-</span>
+        </div>
+
+        <div class="actions actions-2">
+          <button type="button" class="btn btn-primary" id="btn-create" data-i18n="createTheme">生成主题</button>
+          <button type="button" class="btn btn-ghost" id="btn-open-themes" data-i18n="openThemes">打开主题文件夹</button>
+        </div>
+      </section>
+
+      <section class="log-block">
+        <p class="eyebrow" data-i18n="activity">活动日志</p>
+        <pre class="log" id="log" aria-live="polite"></pre>
+      </section>
+    </main>
+
+    <footer class="foot">
+      <p data-i18n="footer">不修改 Cursor 安装文件。调试端口仅绑定 127.0.0.1。</p>
+    </footer>
+  </div>
+
+  <dialog id="confirm" class="dialog">
+    <form method="dialog" class="dialog-card">
+      <h2 id="confirm-title"></h2>
+      <p id="confirm-body"></p>
+      <div class="dialog-actions">
+        <button value="cancel" class="btn btn-ghost" id="confirm-cancel" data-i18n="cancel">取消</button>
+        <button value="ok" class="btn btn-primary" id="confirm-ok" data-i18n="confirm">确认</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="wizard" class="dialog dialog-wide">
+    <form method="dialog" class="dialog-card wizard-card" id="wizard-form">
+      <p class="eyebrow" data-i18n="wizardStep">首次设置</p>
+      <h2 data-i18n="wizardTitle">找到 Cursor</h2>
+      <p class="wizard-body" data-i18n="wizardBody">Dream Skin 需要知道 Cursor.exe 的位置。可以自动检测，也可以手动选择。</p>
+      <label class="field">
+        <span data-i18n="cursorPath">Cursor 路径</span>
+        <input id="wizard-path" type="text" spellcheck="false" data-i18n-placeholder="cursorPathPh" placeholder="C:\...\Cursor.exe" />
+      </label>
+      <div class="dialog-actions wizard-actions">
+        <button type="button" class="btn btn-ghost" id="wizard-browse" data-i18n="browseCursor">浏览…</button>
+        <button type="submit" value="ok" class="btn btn-primary" id="wizard-continue" data-i18n="wizardContinue">继续</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="./app.js"></script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "rain-cafe",
+  "name": "雨窗咖啡馆",
+  "image": "art.jpg",
+  "artFit": "cover",
+  "artPosition": "center",
+  "artFilter": "none",
+  "colors": {
+    "dim": "rgba(4, 3, 10, 0.20)",
+    "chrome": "rgba(37, 21, 14, 0.72)",
+    "sidebar": "rgba(30, 17, 11, 0.55)",
+    "editor": "rgba(26, 15, 10, 0.88)",
+    "aiPane": "rgba(33, 19, 13, 0.70)",
+    "input": "rgba(59, 34, 22, 0.92)",
+    "widget": "rgba(44, 26, 17, 0.97)",
+    "foreground": "#f4f1ec",
+    "mutedForeground": "rgba(244, 241, 236, 0.72)",
+    "accent": "#f3a268",
+    "line": "#f3a26840"
+  },
+  "mode": "dark",
+  "builtin": true,
+  "hidden": false,
+  "custom": false
+}

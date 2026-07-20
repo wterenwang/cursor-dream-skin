@@ -1,0 +1,7 @@
+/* 墨台小书吏 — cool indigo chrome, soft paper edge */
+.cursor-dream-skin[data-cds-flavor="ink-clerk"] .monaco-workbench .part.titlebar {
+  border-bottom: 1px solid color-mix(in srgb, var(--cds-accent) 28%, transparent) !important;
+}
+.cursor-dream-skin[data-cds-flavor="ink-clerk"] .monaco-workbench .part.activitybar .action-item.checked .action-label {
+  color: var(--cds-accent) !important;
+}

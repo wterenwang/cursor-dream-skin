@@ -1,0 +1,7 @@
+/* 午后茶役 — warm amber title edge */
+.cursor-dream-skin[data-cds-flavor="tea-host"] .monaco-workbench .part.titlebar {
+  background-image: linear-gradient(180deg, color-mix(in srgb, var(--cds-accent) 12%, transparent), transparent) !important;
+}
+.cursor-dream-skin[data-cds-flavor="tea-host"] .monaco-workbench .part.sidebar .composite.title h2 {
+  letter-spacing: 0.06em;
+}

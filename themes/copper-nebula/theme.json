@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "copper-nebula",
+  "name": "铜尘星云",
+  "image": "art.jpg",
+  "artFit": "cover",
+  "artPosition": "center",
+  "artFilter": "none",
+  "colors": {
+    "dim": "rgba(4, 3, 10, 0.20)",
+    "chrome": "rgba(17, 28, 34, 0.72)",
+    "sidebar": "rgba(13, 23, 27, 0.55)",
+    "editor": "rgba(12, 20, 24, 0.88)",
+    "aiPane": "rgba(15, 25, 31, 0.70)",
+    "input": "rgba(27, 45, 55, 0.92)",
+    "widget": "rgba(20, 34, 41, 0.97)",
+    "foreground": "#f4f1ec",
+    "mutedForeground": "rgba(244, 241, 236, 0.72)",
+    "accent": "#68d0f3",
+    "line": "#68d0f340"
+  },
+  "mode": "dark",
+  "builtin": true,
+  "hidden": false,
+  "custom": false
+}

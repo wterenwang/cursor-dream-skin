@@ -1,0 +1,331 @@
+/* Cursor Dream Skin — static layer.
+ * Background token remixing happens in renderer-inject.js (dynamic style);
+ * this file holds the art layer and transparency fixes for surfaces that
+ * paint opaque colors outside the --vscode-* token system. */
+
+/* ---- decoration layer (inserted by renderer-inject.js) ---- */
+#cursor-dream-skin-art {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+#cursor-dream-skin-art .cds-image {
+  position: absolute;
+  inset: 0;
+  background-image: var(--cds-art);
+  background-size: var(--cds-art-fit, cover);
+  background-position: var(--cds-art-position, center);
+  background-repeat: no-repeat;
+  filter: var(--cds-art-filter, none);
+}
+#cursor-dream-skin-art .cds-dim {
+  position: absolute;
+  inset: 0;
+  background: var(--cds-dim, rgba(0, 0, 0, 0.25));
+}
+#cursor-dream-skin-art .cds-backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--cds-backdrop, transparent);
+  pointer-events: none;
+}
+
+/* Mascot / atmosphere layouts — character is not a full-bleed wallpaper. */
+.cursor-dream-skin[data-cds-art-mode="mascot"] #cursor-dream-skin-art .cds-image {
+  inset: auto;
+  right: var(--cds-mascot-right, 0%);
+  bottom: var(--cds-mascot-bottom, 0%);
+  left: auto;
+  top: auto;
+  width: var(--cds-mascot-width, min(44vw, 540px));
+  height: var(--cds-mascot-height, min(82vh, 860px));
+  background-size: contain;
+  background-position: right bottom;
+  background-repeat: no-repeat;
+  opacity: var(--cds-mascot-opacity, 0.92);
+  filter: var(--cds-art-filter, none);
+}
+.cursor-dream-skin[data-cds-art-mode="atmosphere"] #cursor-dream-skin-art .cds-image {
+  background-size: cover;
+  background-position: var(--cds-art-position, center);
+  opacity: 0.55;
+  filter: blur(2px) saturate(1.05);
+}
+
+/* ---- chrome personality (beyond wallpaper) ---- */
+.cursor-dream-skin[data-cds-stripe="1"] .monaco-workbench .part.statusbar {
+  box-shadow: inset 0 2px 0 0 var(--cds-accent) !important;
+}
+.cursor-dream-skin[data-cds-activity-glow="1"] .monaco-workbench .part.activitybar {
+  box-shadow:
+    inset -1px 0 0 var(--cds-line, transparent),
+    0 0 28px color-mix(in srgb, var(--cds-accent) 28%, transparent) !important;
+}
+.cursor-dream-skin[data-cds-sidebar-bloom="1"] .monaco-workbench .part.sidebar {
+  box-shadow:
+    inset 0 0 0 1px var(--cds-line, transparent),
+    inset -40px 0 80px -48px color-mix(in srgb, var(--cds-accent) 22%, transparent) !important;
+}
+.cursor-dream-skin[data-cds-tab-pearl="1"] .monaco-workbench .part.editor .tabs-container > .tab.active {
+  box-shadow: inset 0 -2px 0 0 var(--cds-accent) !important;
+}
+.cursor-dream-skin[data-cds-tab-pearl="1"] .monaco-workbench .part.editor .tabs-container > .tab.active::after {
+  content: "";
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cds-accent);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--cds-accent) 70%, transparent);
+  pointer-events: none;
+}
+.cursor-dream-skin[data-cds-aipane-ribbon="1"] .monaco-workbench .part.auxiliarybar {
+  box-shadow:
+    inset 3px 0 0 0 var(--cds-accent),
+    inset 0 0 0 1px var(--cds-line, transparent) !important;
+}
+
+/* Tiny status motto (看板娘 personality line) */
+.cursor-dream-skin[data-cds-motto="1"] .monaco-workbench .part.statusbar::after {
+  content: var(--cds-motto, "");
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--cds-accent) 85%, var(--cds-fg));
+  opacity: 0.85;
+  pointer-events: none;
+  max-width: 28ch;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.cursor-dream-skin[data-cds-motto="1"] .monaco-workbench .part.statusbar {
+  position: relative;
+}
+
+/* ---- let the art show through the workbench shell ---- */
+.cursor-dream-skin .monaco-workbench {
+  background: transparent !important;
+}
+
+/* grid separators between parts otherwise paint the old opaque background */
+.cursor-dream-skin .monaco-workbench .monaco-grid-view,
+.cursor-dream-skin .monaco-workbench .monaco-grid-branch-node,
+.cursor-dream-skin .monaco-workbench .monaco-split-view2 > .split-view-container > .split-view-view {
+  background: transparent;
+}
+
+/* ---- background rules -------------------------------------------------
+ * VS Code writes part backgrounds as direct rules (not var() references),
+ * so token remapping alone cannot restyle them; these direct rules win. */
+
+.cursor-dream-skin .monaco-workbench .part.titlebar,
+.cursor-dream-skin .monaco-workbench .part.activitybar,
+.cursor-dream-skin .monaco-workbench .part.activitybar > .content,
+.cursor-dream-skin .monaco-workbench .part.statusbar,
+.cursor-dream-skin .monaco-workbench .part.panel,
+.cursor-dream-skin .monaco-workbench .part.banner {
+  background-color: var(--cds-chrome) !important;
+}
+
+.cursor-dream-skin .monaco-workbench .part.sidebar {
+  background-color: var(--cds-sidebar) !important;
+}
+
+.cursor-dream-skin .monaco-workbench .part.editor,
+.cursor-dream-skin .monaco-workbench .part.editor .content,
+.cursor-dream-skin .monaco-workbench .part.editor .editor-container,
+.cursor-dream-skin .monaco-workbench .part.editor .monaco-editor,
+.cursor-dream-skin .monaco-workbench .part.editor .monaco-editor .monaco-editor-background,
+.cursor-dream-skin .monaco-workbench .part.editor .monaco-editor .margin {
+  background-color: transparent !important;
+}
+.cursor-dream-skin .monaco-workbench .part.editor .editor-group-container {
+  background-color: var(--cds-editor) !important;
+}
+.cursor-dream-skin .monaco-workbench .part.editor .editor-group-container > .title {
+  background-color: var(--cds-chrome) !important;
+}
+.cursor-dream-skin .monaco-workbench .part.editor .tabs-container > .tab {
+  background-color: transparent !important;
+}
+.cursor-dream-skin .monaco-workbench .part.editor .tabs-container > .tab.active {
+  background-color: var(--cds-editor) !important;
+}
+.cursor-dream-skin .monaco-workbench .part.editor .sticky-widget,
+.cursor-dream-skin .monaco-workbench .part.editor .monaco-breadcrumbs {
+  background-color: var(--cds-chrome) !important;
+}
+/* welcome page / settings / other webby editors */
+.cursor-dream-skin .monaco-workbench .part.editor .gettingStartedContainer,
+.cursor-dream-skin .monaco-workbench .part.editor .settings-editor,
+.cursor-dream-skin .monaco-workbench .part.editor .welcome-view {
+  background-color: transparent !important;
+}
+
+.cursor-dream-skin .monaco-workbench .part.auxiliarybar {
+  background-color: var(--cds-aipane) !important;
+}
+
+/* floating widgets stay near-opaque for readability */
+.cursor-dream-skin .monaco-workbench .quick-input-widget,
+.cursor-dream-skin .monaco-workbench .notifications-center,
+.cursor-dream-skin .monaco-workbench .notification-toast,
+.cursor-dream-skin .monaco-workbench .monaco-menu-container,
+.cursor-dream-skin .monaco-workbench .suggest-widget,
+.cursor-dream-skin .monaco-workbench .monaco-hover,
+.cursor-dream-skin .monaco-workbench .context-view {
+  background-color: var(--cds-widget) !important;
+}
+
+/* ---- surfaces that paint hardcoded opaque colors ---- */
+.cursor-dream-skin .monaco-workbench .part.auxiliarybar .composer-bar,
+.cursor-dream-skin .monaco-workbench .part.auxiliarybar .composite.title,
+.cursor-dream-skin .monaco-workbench .part.auxiliarybar .pane-body,
+.cursor-dream-skin .monaco-workbench .part.auxiliarybar .pane-header,
+.cursor-dream-skin .monaco-workbench .part.sidebar .composite.title,
+.cursor-dream-skin .monaco-workbench .part.sidebar .pane-body,
+.cursor-dream-skin .monaco-workbench .part.sidebar .pane-header,
+.cursor-dream-skin .monaco-workbench .part.panel .composite.title {
+  background-color: transparent !important;
+}
+
+/* Cursor AI composer input paints color(srgb … / 0.9); tone it to the input token */
+.cursor-dream-skin .monaco-workbench .part.auxiliarybar .ai-input-full-input-box,
+.cursor-dream-skin .monaco-workbench .part.auxiliarybar .full-input-box,
+.cursor-dream-skin .monaco-workbench .part.auxiliarybar .monaco-inputbox {
+  background-color: var(--cds-input) !important;
+}
+
+/* terminal: keep wrappers transparent so the panel token shows through */
+.cursor-dream-skin .monaco-workbench .terminal-outer-container,
+.cursor-dream-skin .monaco-workbench .xterm-viewport {
+  background-color: transparent !important;
+}
+
+/* ---- floating widgets get a blur so text stays readable over art ---- */
+.cursor-dream-skin .monaco-workbench .quick-input-widget,
+.cursor-dream-skin .monaco-workbench .notifications-center,
+.cursor-dream-skin .monaco-workbench .notification-toast,
+.cursor-dream-skin .monaco-workbench .monaco-menu-container {
+  backdrop-filter: blur(16px);
+}
+
+/* ---- Agents window (React "glass" shell) --------------------------------
+ * Not workbench DOM: surfaces read --glass-* variables that Cursor declares
+ * with literal colors (in adopted stylesheets), so re-declare them on every
+ * element with !important to win the cascade wherever they originate. */
+.cursor-dream-skin body,
+.cursor-dream-skin body * {
+  --glass-surface-background: transparent !important;
+  --glass-vibrancy-on-surface-background: transparent !important;
+  --glass-sidebar-surface-background: var(--cds-sidebar) !important;
+  --glass-vibrancy-on-sidebar-surface-background: var(--cds-sidebar) !important;
+  --glass-vibrancy-off-sidebar-surface-background: var(--cds-sidebar) !important;
+  --glass-chat-surface-background: var(--cds-aipane) !important;
+  --glass-vibrancy-on-chat-surface-background: var(--cds-aipane) !important;
+  --glass-vibrancy-off-chat-surface-background: var(--cds-aipane) !important;
+  --glass-editor-surface-background: var(--cds-editor) !important;
+  --glass-vibrancy-on-editor-surface-background: var(--cds-editor) !important;
+  --glass-vibrancy-off-editor-surface-background: var(--cds-editor) !important;
+  --glass-chat-bubble-background: var(--cds-input) !important;
+  --glass-onboard-surface-background: var(--cds-chrome) !important;
+  --glass-window-border-color: var(--cds-line) !important;
+}
+
+/* direct fallbacks in case a surface paints its color without the variable */
+.cursor-dream-skin .glass-sidebar-docked {
+  background-color: var(--cds-sidebar) !important;
+}
+.cursor-dream-skin .agent-panel {
+  background-color: var(--cds-aipane) !important;
+}
+
+/* ---- accents ---- */
+.cursor-dream-skin .monaco-workbench .part.editor .tabs-container > .tab.active .tab-label {
+  color: var(--cds-accent) !important;
+}
+.cursor-dream-skin .monaco-workbench .part.sidebar .composite.title h2 {
+  color: var(--cds-accent) !important;
+}
+.cursor-dream-skin .monaco-workbench .part.sidebar,
+.cursor-dream-skin .monaco-workbench .part.auxiliarybar {
+  box-shadow: inset 0 0 0 1px var(--cds-line, transparent);
+}
+
+/* ---- chat / markdown code blocks (readability) --------------------------
+ * Warm dark themes + translucent panels often leave dark syntax text on a
+ * dark pre background. Force near-opaque surfaces + high-contrast text. */
+.cursor-dream-skin pre,
+.cursor-dream-skin .markdown-body pre,
+.cursor-dream-skin [class*="markdown"] pre,
+.cursor-dream-skin [class*="Markdown"] pre,
+.cursor-dream-skin [class*="code-block"],
+.cursor-dream-skin [class*="codeBlock"],
+.cursor-dream-skin [class*="CodeBlock"],
+.cursor-dream-skin [class*="composer"] pre,
+.cursor-dream-skin [class*="anysphere"] pre,
+.cursor-dream-skin [class*="ComposerCodeBlock"],
+.cursor-dream-skin [class*="composer-code-block"] {
+  background-color: var(--cds-code-bg, var(--cds-widget)) !important;
+  color: var(--cds-code-fg, var(--cds-fg)) !important;
+  border: 1px solid var(--cds-line, rgba(255, 255, 255, 0.12)) !important;
+  opacity: 1 !important;
+  backdrop-filter: blur(12px);
+}
+
+/* Dark skins: force light text (Cursor sometimes keeps dark syntax tokens). */
+.cursor-dream-skin[data-cds-mode="dark"] pre,
+.cursor-dream-skin[data-cds-mode="dark"] pre code,
+.cursor-dream-skin[data-cds-mode="dark"] pre code span,
+.cursor-dream-skin[data-cds-mode="dark"] [class*="code-block"],
+.cursor-dream-skin[data-cds-mode="dark"] [class*="code-block"] *,
+.cursor-dream-skin[data-cds-mode="dark"] [class*="codeBlock"],
+.cursor-dream-skin[data-cds-mode="dark"] [class*="codeBlock"] *,
+.cursor-dream-skin[data-cds-mode="dark"] [class*="CodeBlock"],
+.cursor-dream-skin[data-cds-mode="dark"] [class*="CodeBlock"] *,
+.cursor-dream-skin[data-cds-mode="dark"] [class*="ComposerCodeBlock"],
+.cursor-dream-skin[data-cds-mode="dark"] [class*="ComposerCodeBlock"] *,
+.cursor-dream-skin[data-cds-mode="dark"] [class*="composer-code-block"],
+.cursor-dream-skin[data-cds-mode="dark"] [class*="composer-code-block"] * {
+  color: var(--cds-code-fg, #f4f1ec) !important;
+  -webkit-text-fill-color: var(--cds-code-fg, #f4f1ec) !important;
+}
+
+.cursor-dream-skin[data-cds-mode="dark"] pre code,
+.cursor-dream-skin[data-cds-mode="dark"] [class*="code-block"] code,
+.cursor-dream-skin[data-cds-mode="dark"] [class*="codeBlock"] code,
+.cursor-dream-skin[data-cds-mode="dark"] [class*="CodeBlock"] code {
+  background: transparent !important;
+}
+
+/* Light skins: force dark text on code surfaces. */
+.cursor-dream-skin[data-cds-mode="light"] pre,
+.cursor-dream-skin[data-cds-mode="light"] pre code,
+.cursor-dream-skin[data-cds-mode="light"] pre code span,
+.cursor-dream-skin[data-cds-mode="light"] [class*="code-block"],
+.cursor-dream-skin[data-cds-mode="light"] [class*="code-block"] *,
+.cursor-dream-skin[data-cds-mode="light"] [class*="codeBlock"],
+.cursor-dream-skin[data-cds-mode="light"] [class*="codeBlock"] *,
+.cursor-dream-skin[data-cds-mode="light"] [class*="CodeBlock"],
+.cursor-dream-skin[data-cds-mode="light"] [class*="CodeBlock"] * {
+  color: var(--cds-code-fg, #1a1612) !important;
+  -webkit-text-fill-color: var(--cds-code-fg, #1a1612) !important;
+}
+
+/* inline code chips */
+.cursor-dream-skin :not(pre) > code,
+.cursor-dream-skin .markdown-body :not(pre) > code,
+.cursor-dream-skin [class*="markdown"] :not(pre) > code {
+  background-color: var(--cds-input) !important;
+  color: var(--cds-code-fg, var(--cds-fg)) !important;
+  -webkit-text-fill-color: var(--cds-code-fg, var(--cds-fg)) !important;
+  border: 1px solid var(--cds-line, rgba(255, 255, 255, 0.1)) !important;
+  opacity: 1 !important;
+}

@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "sakura-night",
+  "name": "樱夜湖畔",
+  "image": "art.jpg",
+  "artFit": "cover",
+  "artPosition": "center",
+  "artFilter": "none",
+  "colors": {
+    "dim": "rgba(4, 3, 10, 0.20)",
+    "chrome": "rgba(14, 19, 37, 0.72)",
+    "sidebar": "rgba(11, 15, 30, 0.55)",
+    "editor": "rgba(10, 13, 26, 0.88)",
+    "aiPane": "rgba(13, 17, 33, 0.70)",
+    "input": "rgba(22, 30, 59, 0.92)",
+    "widget": "rgba(17, 23, 44, 0.97)",
+    "foreground": "#f4f1ec",
+    "mutedForeground": "rgba(244, 241, 236, 0.72)",
+    "accent": "#68a2f3",
+    "line": "#68a2f340"
+  },
+  "mode": "dark",
+  "builtin": true,
+  "hidden": false,
+  "custom": false
+}

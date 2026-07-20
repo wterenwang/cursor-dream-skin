@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "demo-custom",
+  "name": "Demo Custom",
+  "image": "art.jpg",
+  "artFit": "cover",
+  "artPosition": "center",
+  "artFilter": "none",
+  "colors": {
+    "dim": "rgba(4, 3, 10, 0.20)",
+    "chrome": "rgba(16, 14, 37, 0.72)",
+    "sidebar": "rgba(13, 11, 30, 0.55)",
+    "editor": "rgba(11, 10, 26, 0.88)",
+    "aiPane": "rgba(14, 13, 33, 0.70)",
+    "input": "rgba(26, 22, 59, 0.92)",
+    "widget": "rgba(19, 17, 44, 0.97)",
+    "foreground": "#f4f1ec",
+    "mutedForeground": "rgba(244, 241, 236, 0.72)",
+    "accent": "#8b68f3",
+    "line": "#8b68f340"
+  },
+  "mode": "dark",
+  "builtin": false,
+  "hidden": true,
+  "custom": true
+}

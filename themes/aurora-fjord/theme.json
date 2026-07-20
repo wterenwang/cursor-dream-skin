@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "aurora-fjord",
+  "name": "极光峡湾",
+  "image": "art.jpg",
+  "artFit": "cover",
+  "artPosition": "center",
+  "artFilter": "none",
+  "colors": {
+    "dim": "rgba(4, 3, 10, 0.20)",
+    "chrome": "rgba(14, 27, 37, 0.72)",
+    "sidebar": "rgba(11, 22, 30, 0.55)",
+    "editor": "rgba(10, 19, 26, 0.88)",
+    "aiPane": "rgba(13, 25, 33, 0.70)",
+    "input": "rgba(22, 44, 59, 0.92)",
+    "widget": "rgba(17, 33, 44, 0.97)",
+    "foreground": "#f4f1ec",
+    "mutedForeground": "rgba(244, 241, 236, 0.72)",
+    "accent": "#68b9f3",
+    "line": "#68b9f340"
+  },
+  "mode": "dark",
+  "builtin": true,
+  "hidden": false,
+  "custom": false
+}

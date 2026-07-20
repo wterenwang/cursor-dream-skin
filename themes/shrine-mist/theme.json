@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "shrine-mist",
+  "name": "雾中鸟居",
+  "image": "art.jpg",
+  "artFit": "cover",
+  "artPosition": "center",
+  "artFilter": "none",
+  "colors": {
+    "dim": "rgba(4, 3, 10, 0.20)",
+    "chrome": "rgba(15, 36, 28, 0.72)",
+    "sidebar": "rgba(12, 29, 22, 0.55)",
+    "editor": "rgba(11, 25, 19, 0.88)",
+    "aiPane": "rgba(14, 32, 25, 0.70)",
+    "input": "rgba(24, 57, 44, 0.92)",
+    "widget": "rgba(18, 43, 33, 0.97)",
+    "foreground": "#f4f1ec",
+    "mutedForeground": "rgba(244, 241, 236, 0.72)",
+    "accent": "#f3d068",
+    "line": "#f3d06840"
+  },
+  "mode": "dark",
+  "builtin": true,
+  "hidden": false,
+  "custom": false
+}

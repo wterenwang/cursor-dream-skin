@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "ink-mountains",
+  "name": "青岚山色",
+  "image": "art.jpg",
+  "artFit": "cover",
+  "artPosition": "center",
+  "artFilter": "none",
+  "colors": {
+    "dim": "rgba(4, 3, 10, 0.20)",
+    "chrome": "rgba(32, 29, 19, 0.72)",
+    "sidebar": "rgba(26, 23, 15, 0.55)",
+    "editor": "rgba(23, 20, 13, 0.88)",
+    "aiPane": "rgba(29, 26, 17, 0.70)",
+    "input": "rgba(52, 46, 30, 0.92)",
+    "widget": "rgba(39, 34, 22, 0.97)",
+    "foreground": "#f4f1ec",
+    "mutedForeground": "rgba(244, 241, 236, 0.72)",
+    "accent": "#f3d068",
+    "line": "#f3d06840"
+  },
+  "mode": "dark",
+  "builtin": true,
+  "hidden": false,
+  "custom": false
+}

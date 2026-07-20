@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "neon-rain",
+  "name": "霓虹雨街",
+  "image": "art.jpg",
+  "artFit": "cover",
+  "artPosition": "center",
+  "artFilter": "none",
+  "colors": {
+    "dim": "rgba(4, 3, 10, 0.20)",
+    "chrome": "rgba(14, 29, 37, 0.72)",
+    "sidebar": "rgba(11, 24, 30, 0.55)",
+    "editor": "rgba(10, 21, 26, 0.88)",
+    "aiPane": "rgba(13, 26, 33, 0.70)",
+    "input": "rgba(22, 47, 59, 0.92)",
+    "widget": "rgba(17, 35, 44, 0.97)",
+    "foreground": "#f4f1ec",
+    "mutedForeground": "rgba(244, 241, 236, 0.72)",
+    "accent": "#68d0f3",
+    "line": "#68d0f340"
+  },
+  "mode": "dark",
+  "builtin": true,
+  "hidden": false,
+  "custom": false
+}
