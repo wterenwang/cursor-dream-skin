@@ -22,5 +22,7 @@
   "mode": "dark",
   "builtin": true,
   "hidden": false,
-  "custom": false
+  "custom": false,
+  "featured": true,
+  "featuredOrder": 5
 }

@@ -37,11 +37,15 @@
               <dd id="meta-cursor">-</dd>
             </div>
             <div>
-              <dt data-i18n="theme">主题</dt>
+              <dt data-i18n="theme">壁纸</dt>
               <dd id="meta-theme">-</dd>
             </div>
             <div>
-              <dt data-i18n="port">端口</dt>
+              <dt data-i18n="deskPet">桌宠</dt>
+              <dd id="meta-pet">-</dd>
+            </div>
+            <div>
+              <dt data-i18n="port">连接</dt>
               <dd id="meta-port">-</dd>
             </div>
           </dl>
@@ -57,8 +61,13 @@
 
       <section class="compose">
         <label class="field">
-          <span data-i18n="theme">主题</span>
+          <span data-i18n="theme">壁纸主题</span>
           <select id="theme-select"></select>
+        </label>
+
+        <label class="field">
+          <span data-i18n="deskPet">桌宠</span>
+          <select id="pet-select"></select>
         </label>
 
         <label class="check-row">
@@ -76,8 +85,8 @@
             </label>
             <label class="field">
               <span data-i18n="tuneEditor">编辑器不透明度</span>
-              <input id="tune-editor" type="range" min="50" max="100" step="1" value="90" />
-              <output id="tune-editor-val">0.90</output>
+              <input id="tune-editor" type="range" min="85" max="100" step="1" value="94" />
+              <output id="tune-editor-val">0.94</output>
             </label>
             <label class="field">
               <span data-i18n="tunePosition">背景位置</span>
@@ -152,7 +161,7 @@
     </main>
 
     <footer class="foot">
-      <p data-i18n="footer">不修改 Cursor 安装文件。调试端口仅绑定 127.0.0.1。</p>
+      <p data-i18n="footer">不会改动 Cursor 的安装文件。一切都在你这台电脑上完成。</p>
     </footer>
   </div>
 

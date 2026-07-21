@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "pet-spark",
+  "name": "星屑",
+  "mode": "dark",
+  "flavor": "spark",
+  "artMode": "mascot",
+  "pet": true,
+  "image": "art.png",
+  "artFit": "contain",
+  "artPosition": "right bottom",
+  "artFilter": "none",
+  "petStates": {
+    "idle": "idle.png",
+    "working": "working.png",
+    "thinking": "thinking.png",
+    "happy": "happy.png",
+    "attention": "attention.png",
+    "sleeping": "sleeping.png",
+    "error": "error.png"
+  },
+  "mascotWidth": "min(22vw, 280px)",
+  "mascotHeight": "min(42vh, 320px)",
+  "mascotOpacity": "0.98",
+  "backdrop": "radial-gradient(ellipse at 20% 0%, rgba(212, 150, 96, 0.30), transparent 46%), linear-gradient(168deg, #1c1612 0%, #2a211a 50%, #181410 100%)",
+  "decor": {
+    "statusStripe": true,
+    "activityGlow": false,
+    "sidebarBloom": true,
+    "tabPearl": true,
+    "aipaneRibbon": false,
+    "motto": "星屑闪闪 · 慢慢写"
+  },
+  "colors": {
+    "dim": "rgba(12, 8, 6, 0.08)",
+    "chrome": "rgba(36, 28, 22, 0.92)",
+    "sidebar": "rgba(30, 24, 18, 0.94)",
+    "editor": "rgba(26, 20, 16, 0.97)",
+    "aiPane": "rgba(34, 26, 20, 0.95)",
+    "input": "rgba(48, 36, 28, 0.96)",
+    "widget": "rgba(38, 30, 24, 0.98)",
+    "foreground": "#f6efe6",
+    "mutedForeground": "rgba(246, 239, 230, 0.70)",
+    "accent": "#d49a60",
+    "line": "#d49a6040"
+  },
+  "builtin": true,
+  "hidden": false,
+  "custom": false,
+  "featured": true,
+  "featuredOrder": 0
+}

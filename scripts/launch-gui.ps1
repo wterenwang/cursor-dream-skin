@@ -31,8 +31,8 @@ function Test-CdsGuiHttp {
       $body = $reader.ReadToEnd()
       $reader.Close()
       if ([int]$resp.StatusCode -lt 200 -or [int]$resp.StatusCode -ge 300) { return $false }
-      # Stale GUI servers (pre-wizard) lack version/cursorFound — force recycle.
-      if ($body -notmatch '"version"\s*:' -or $body -notmatch '"cursorFound"\s*:') {
+      # Stale GUI servers (pre-wizard / pre-pet split) — force recycle.
+      if ($body -notmatch '"version"\s*:' -or $body -notmatch '"cursorFound"\s*:' -or $body -notmatch '"petId"\s*:') {
         Write-CdsGuiLaunchLog 'Existing GUI is outdated — will recycle'
         return $false
       }

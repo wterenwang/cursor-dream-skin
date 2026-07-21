@@ -4,6 +4,7 @@ cd /d "%~dp0.."
 title Cursor Dream Skin - Restore
 echo.
 echo Restoring official Cursor look...
+echo 正在还原 Cursor 官方外观...
 echo.
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0restore-dream-skin.ps1"
 set "EC=%ERRORLEVEL%"

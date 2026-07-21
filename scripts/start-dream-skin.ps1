@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param(
   [int]$Port = 9666,
   [string]$ThemeDir,
@@ -13,7 +13,7 @@ $PortExplicit = $PSBoundParameters.ContainsKey('Port')
 try {
   . (Join-Path $PSScriptRoot 'common-windows.ps1')
 
-  Write-Host 'Cursor Dream Skin - starting...' -ForegroundColor Cyan
+  Write-Host 'Cursor Dream Skin — 开始应用…' -ForegroundColor Cyan
   Assert-CdsPort -Port $Port
   $cursorExe = Find-CdsCursorExe
   Write-Host "Cursor: $cursorExe"
@@ -31,7 +31,7 @@ try {
   Set-CdsActiveTheme -ThemeDir $resolvedTheme
   Write-Host "Theme: $resolvedTheme"
 
-  Write-Host 'Validating theme payload...'
+  Write-Host '正在检查主题…'
   $check = Invoke-CdsNode -ArgumentList @(
     $script:CdsInjector, '--check-payload', '--theme-dir', $resolvedTheme
   ) -PassThru
@@ -39,14 +39,14 @@ try {
     Write-Host $check.StdErr
     Write-CdsFail "Theme payload validation failed for $resolvedTheme"
   }
-  Write-Host 'Payload OK.'
+  Write-Host '主题检查通过。'
 
   if (-not $PortExplicit) {
     $state = Read-CdsState
     if ($state -and $state.port) { $Port = [int]$state.port }
   }
 
-  Write-Host "Checking CDP on port $Port..."
+  Write-Host "正在确认能否换肤（端口 $Port）…"
   $debugReady = Test-CdsVerifiedCdpEndpoint -Port $Port
   $cursorRunning = Test-CdsCursorRunning
   Write-Host "Cursor running: $cursorRunning | CDP ready: $debugReady"
@@ -61,21 +61,21 @@ try {
     if (-not $RestartExisting) {
       Write-CdsFail 'Cursor is already running without the skin CDP endpoint. Pass -RestartExisting (or -PromptRestart), or close Cursor first.'
     }
-    Write-Host 'Restarting Cursor to enable Dream Skin CDP...'
+    Write-Host '正在重启 Cursor，以便挂上皮肤…'
     Stop-CdsCursor -Force
     $debugReady = $false
   }
 
   if (-not $debugReady) {
     $Port = Select-CdsAvailablePort -StartPort $Port
-    Write-Host "Launching Cursor with skin debug port $Port..."
+    Write-Host "正在启动 Cursor…"
     Start-CdsCursorWithCdp -Port $Port
     if (-not (Wait-CdsCdp -Port $Port -TimeoutSec 60)) {
       Write-CdsFail "Cursor did not expose a loopback CDP endpoint on port $Port within 60 seconds. See $script:CdsAppLog"
     }
   }
 
-  Write-Host 'Starting injector daemon...'
+  Write-Host '正在挂上皮肤…'
   Stop-CdsRecordedInjector
   Stop-CdsStrayInjectors
   if (Test-Path -LiteralPath $script:CdsStatePath) {
@@ -96,7 +96,7 @@ try {
   Write-CdsState -Port $Port -InjectorPid $injectorPid -InjectorStartedAt $startedAt -ThemeDir $resolvedTheme
   Write-Host "Injector PID: $injectorPid"
 
-  Write-Host 'Verifying injection...'
+  Write-Host '正在确认效果…'
   $verify = Invoke-CdsNode -ArgumentList @(
     $script:CdsInjector, '--verify', '--port', "$Port",
     '--theme-dir', $resolvedTheme, '--timeout-ms', '20000'
@@ -116,6 +116,8 @@ try {
     Write-Host $verify.StdErr
     Write-CdsFail "Injection verification failed; the injector was stopped. See $script:CdsInjectorErrorLog"
   }
+
+  Sync-CdsDeskPetForTheme -ThemeDir $resolvedTheme
 
   Write-Host ''
   Write-Host 'Done. Press Enter to close...'

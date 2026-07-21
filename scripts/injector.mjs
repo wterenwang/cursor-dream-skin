@@ -209,6 +209,47 @@ function sanitizeColor(value, fallback) {
   return HEX_COLOR.test(normalized) || FUNC_COLOR.test(normalized) ? normalized : fallback;
 }
 
+/** Raise rgba()/rgb() alpha so busy wallpapers cannot wash out glyphs. */
+function ensureMinAlpha(value, minAlpha) {
+  const raw = String(value || "").trim();
+  const m = /^rgba?\(\s*([0-9.]+)\s*,\s*([0-9.]+)\s*,\s*([0-9.]+)(?:\s*,\s*([0-9.]+))?\s*\)$/i.exec(raw);
+  if (!m) return value;
+  const r = Number(m[1]);
+  const g = Number(m[2]);
+  const b = Number(m[3]);
+  const a = m[4] === undefined ? 1 : Number(m[4]);
+  if (![r, g, b, a].every((n) => Number.isFinite(n))) return value;
+  const next = Math.min(1, Math.max(a, minAlpha));
+  if (next === a) return raw.startsWith("rgb(") && m[4] === undefined ? raw : `rgba(${r}, ${g}, ${b}, ${a})`;
+  return `rgba(${r}, ${g}, ${b}, ${Number(next.toFixed(3))})`;
+}
+
+function ensureReadableColors(colors, mode, artMode) {
+  const dark = String(mode || "dark").toLowerCase() !== "light";
+  const mascot = String(artMode || "").toLowerCase() === "mascot";
+  // Mascot themes are not wallpapers: panels stay nearly solid so the figure only peeks from the corner.
+  let floors;
+  if (mascot) {
+    floors = dark
+      ? { dim: 0.08, chrome: 0.92, sidebar: 0.94, editor: 0.97, aiPane: 0.95, input: 0.96, widget: 0.98 }
+      : { dim: 0.06, chrome: 0.90, sidebar: 0.92, editor: 0.96, aiPane: 0.94, input: 0.96, widget: 0.98 };
+  } else {
+    floors = dark
+      ? { dim: 0.32, chrome: 0.82, sidebar: 0.84, editor: 0.94, aiPane: 0.88, input: 0.94, widget: 0.97 }
+      : { dim: 0.18, chrome: 0.78, sidebar: 0.80, editor: 0.92, aiPane: 0.86, input: 0.94, widget: 0.97 };
+  }
+  return {
+    ...colors,
+    dim: ensureMinAlpha(colors.dim, floors.dim),
+    chrome: ensureMinAlpha(colors.chrome, floors.chrome),
+    sidebar: ensureMinAlpha(colors.sidebar, floors.sidebar),
+    editor: ensureMinAlpha(colors.editor, floors.editor),
+    aiPane: ensureMinAlpha(colors.aiPane, floors.aiPane),
+    input: ensureMinAlpha(colors.input, floors.input),
+    widget: ensureMinAlpha(colors.widget, floors.widget),
+  };
+}
+
 function sanitizeText(value, fallback, max) {
   return typeof value === "string" && value.trim() ? value.trim().slice(0, max) : fallback;
 }
@@ -246,9 +287,9 @@ export async function loadTheme(themeDir) {
     artPosition: sanitizeText(raw.artPosition, "center", 40),
     artFilter: sanitizeText(raw.artFilter, "none", 120),
     backdrop: sanitizeText(raw.backdrop, "transparent", 420),
-    mascotWidth: sanitizeText(raw.mascotWidth, "min(44vw, 540px)", 40),
-    mascotHeight: sanitizeText(raw.mascotHeight, "min(82vh, 860px)", 40),
-    mascotOpacity: sanitizeText(String(raw.mascotOpacity ?? "0.92"), "0.92", 8),
+    mascotWidth: sanitizeText(raw.mascotWidth, "min(26vw, 320px)", 40),
+    mascotHeight: sanitizeText(raw.mascotHeight, "min(58vh, 560px)", 40),
+    mascotOpacity: sanitizeText(String(raw.mascotOpacity ?? "0.95"), "0.95", 8),
     flavor: sanitizeText(raw.flavor, "", 40),
     decor: {
       statusStripe: Boolean(decor.statusStripe),
@@ -258,19 +299,19 @@ export async function loadTheme(themeDir) {
       aipaneRibbon: Boolean(decor.aipaneRibbon),
       motto: sanitizeMotto(decor.motto),
     },
-    colors: {
-      dim: sanitizeColor(colors.dim, "rgba(8, 6, 18, 0.30)"),
-      chrome: sanitizeColor(colors.chrome, "rgba(16, 12, 34, 0.78)"),
-      sidebar: sanitizeColor(colors.sidebar, sanitizeColor(colors.chrome, "rgba(16, 12, 34, 0.78)")),
-      editor: sanitizeColor(colors.editor, "rgba(12, 10, 26, 0.88)"),
-      aiPane: sanitizeColor(colors.aiPane, "rgba(16, 12, 34, 0.80)"),
-      input: sanitizeColor(colors.input, "rgba(28, 22, 52, 0.85)"),
-      widget: sanitizeColor(colors.widget, "rgba(20, 16, 40, 0.96)"),
+    colors: ensureReadableColors({
+      dim: sanitizeColor(colors.dim, "rgba(8, 6, 18, 0.32)"),
+      chrome: sanitizeColor(colors.chrome, "rgba(16, 12, 34, 0.82)"),
+      sidebar: sanitizeColor(colors.sidebar, sanitizeColor(colors.chrome, "rgba(16, 12, 34, 0.84)")),
+      editor: sanitizeColor(colors.editor, "rgba(12, 10, 26, 0.94)"),
+      aiPane: sanitizeColor(colors.aiPane, "rgba(16, 12, 34, 0.88)"),
+      input: sanitizeColor(colors.input, "rgba(28, 22, 52, 0.94)"),
+      widget: sanitizeColor(colors.widget, "rgba(20, 16, 40, 0.97)"),
       foreground: sanitizeColor(colors.foreground, "#eae6f5"),
-      mutedForeground: sanitizeColor(colors.mutedForeground, "rgba(234, 230, 245, 0.62)"),
+      mutedForeground: sanitizeColor(colors.mutedForeground, "rgba(234, 230, 245, 0.72)"),
       accent: sanitizeColor(colors.accent, "#c792ea"),
       line: sanitizeColor(colors.line, "rgba(199, 146, 234, 0.25)"),
-    },
+    }, raw.mode, raw.artMode),
   };
   const imagePath = path.join(assetsRoot, theme.image);
   const imageStat = await fs.stat(imagePath);

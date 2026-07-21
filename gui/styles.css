@@ -306,7 +306,14 @@ body { overflow-x: hidden; }
 .preview {
   margin: 0;
   border-left: 1px solid var(--line);
-  background: var(--bg-soft);
+  background:
+    linear-gradient(45deg, #1a1e26 25%, transparent 25%),
+    linear-gradient(-45deg, #1a1e26 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #1a1e26 75%),
+    linear-gradient(-45deg, transparent 75%, #1a1e26 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  background-color: #12151c;
   min-height: 180px;
   display: grid;
   place-items: center;
@@ -321,6 +328,17 @@ body { overflow-x: hidden; }
   height: 100%;
   object-fit: cover;
   filter: saturate(0.92) contrast(1.02);
+}
+
+.preview.has-art.is-pet {
+  background-color: #12151c;
+}
+
+.preview.has-art.is-pet img {
+  object-fit: contain;
+  padding: 12px;
+  filter: none;
+  box-sizing: border-box;
 }
 
 .preview figcaption {

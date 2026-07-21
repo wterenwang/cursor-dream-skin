@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "featuredDefault": "sakura-night",
+  "featuredDefaultPet": "pet-spark",
+  "featured": [
+    { "id": "sakura-night", "blurb": { "zh": "樱夜湖畔 · 壁纸", "en": "Sakura lakeside wallpaper" } },
+    { "id": "rain-cafe", "blurb": { "zh": "雨窗咖啡馆 · 壁纸", "en": "Rainy café wallpaper" } },
+    { "id": "default", "blurb": { "zh": "Dream Night · 经典", "en": "Dream Night classic" } },
+    { "id": "pet-spark", "blurb": { "zh": "暖琥珀星屑 · 桌宠", "en": "Amber spark desk pet" } },
+    { "id": "pet-inkdot", "blurb": { "zh": "青墨水滴 · 桌宠", "en": "Teal inkdot desk pet" } },
+    { "id": "pet-byte", "blurb": { "zh": "品红电波 · 桌宠", "en": "Magenta byte desk pet" } }
+  ]
+}

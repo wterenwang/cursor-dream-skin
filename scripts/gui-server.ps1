@@ -57,6 +57,13 @@ function Set-CdsRgbaAlpha([string]$Color, [double]$Alpha) {
 function Get-CdsThemeListApi {
   param([bool]$ShowHidden = $false)
   $themesRoot = Join-Path $script:CdsProjectRoot 'themes'
+  # catalog.json is the source of truth for featured order / membership
+  $catOrder = @{}
+  $i = 0
+  foreach ($item in @((Get-CdsCatalog).featured)) {
+    $fid = [string]$item.id
+    if ($fid) { $catOrder[$fid] = $i; $i++ }
+  }
   $list = @()
   if (Test-Path -LiteralPath $themesRoot) {
     Get-ChildItem -LiteralPath $themesRoot -Directory | ForEach-Object {
@@ -72,6 +79,10 @@ function Get-CdsThemeListApi {
       $dimAlpha = 0.2
       $editorAlpha = 0.9
       $artMode = 'wallpaper'
+      $featured = $false
+      $featuredOrder = 999
+      $isPet = $false
+      $preview = $null
       try {
         $meta = Get-Content -LiteralPath $jsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
         if ($meta.name) { $name = [string]$meta.name }
@@ -79,9 +90,17 @@ function Get-CdsThemeListApi {
         if ($null -ne $meta.builtin) { $builtin = [bool]$meta.builtin }
         if ($null -ne $meta.hidden) { $hidden = [bool]$meta.hidden }
         if ($null -ne $meta.custom) { $custom = [bool]$meta.custom }
+        if ($null -ne $meta.featured) { $featured = [bool]$meta.featured }
+        if ($null -ne $meta.featuredOrder) { $featuredOrder = [int]$meta.featuredOrder }
         if ($meta.mode) { $mode = [string]$meta.mode }
         if ($meta.artPosition) { $artPosition = [string]$meta.artPosition }
         if ($meta.artMode) { $artMode = [string]$meta.artMode }
+        if ($meta.pet) { $isPet = [bool]$meta.pet }
+        if ($meta.petStates -and $meta.petStates.idle) {
+          $isPet = $true
+          $preview = [string]$meta.petStates.idle
+        }
+        if (-not $preview) { $preview = $image }
         if ($meta.colors) {
           if ($meta.colors.dim) { $dimAlpha = Get-CdsRgbaAlpha ([string]$meta.colors.dim) }
           if ($meta.colors.editor) { $editorAlpha = Get-CdsRgbaAlpha ([string]$meta.colors.editor) }
@@ -89,25 +108,58 @@ function Get-CdsThemeListApi {
         # Heuristic: demo/smoke ids stay hidden even without flags
         if ($_.Name -match '^(smoke-test|demo-)') { $hidden = $true; $custom = $true; $builtin = $false }
       } catch { }
+      if ($catOrder.ContainsKey($_.Name)) {
+        $featured = $true
+        $featuredOrder = [int]$catOrder[$_.Name]
+      }
       if ($hidden -and -not $ShowHidden) { return }
       $list += [pscustomobject]@{
-        id           = $_.Name
-        name         = $name
-        path         = $_.FullName
-        image        = $image
-        builtin      = $builtin
-        hidden       = $hidden
-        custom       = $custom
-        deletable    = (-not $builtin) -or $custom
-        mode         = $mode
-        artMode      = $artMode
-        artPosition  = $artPosition
-        dimAlpha     = [Math]::Round($dimAlpha, 2)
-        editorAlpha  = [Math]::Round($editorAlpha, 2)
+        id            = $_.Name
+        name          = $name
+        path          = $_.FullName
+        image         = $image
+        preview       = $preview
+        pet           = $isPet
+        builtin       = $builtin
+        hidden        = $hidden
+        custom        = $custom
+        featured      = $featured
+        featuredOrder = $featuredOrder
+        deletable     = (-not $builtin) -or $custom
+        mode          = $mode
+        artMode       = $artMode
+        artPosition   = $artPosition
+        dimAlpha      = [Math]::Round($dimAlpha, 2)
+        editorAlpha   = [Math]::Round($editorAlpha, 2)
       }
     }
   }
-  return @($list | Sort-Object @{ Expression = 'builtin'; Descending = $true }, name)
+  return @(
+    $list | Sort-Object `
+      @{ Expression = { if ($_.featured) { 0 } else { 1 } } }, `
+      @{ Expression = 'featuredOrder'; Ascending = $true }, `
+      @{ Expression = 'builtin'; Descending = $true }, `
+      name
+  )
+}
+
+function Get-CdsThemesPayloadApi {
+  param([bool]$ShowHidden = $false)
+  $all = @(Get-CdsThemeListApi -ShowHidden $ShowHidden)
+  $themes = @($all | Where-Object { -not $_.pet })
+  $pets = @($all | Where-Object { $_.pet })
+  $cat = Get-CdsCatalog
+  $petDir = Get-CdsActivePetDir
+  $petId = if ($petDir) { Split-Path -Leaf $petDir } else { 'none' }
+  $featuredPet = [string]$cat.featuredDefaultPet
+  if (-not $featuredPet) { $featuredPet = 'pet-spark' }
+  return [ordered]@{
+    themes             = $themes
+    pets               = $pets
+    activePet          = $petId
+    featuredDefault    = [string]$cat.featuredDefault
+    featuredDefaultPet = $featuredPet
+  }
 }
 
 function Invoke-CdsHotSwitchTheme([string]$ThemeDir) {
@@ -162,7 +214,7 @@ function Invoke-CdsUpdateThemeApi {
   }
   if ($null -ne $EditorAlpha -and "$EditorAlpha" -ne '') {
     $e = [double]$EditorAlpha
-    if ($e -lt 0.5 -or $e -gt 1.0) { throw 'editorAlpha must be between 0.5 and 1.0' }
+    if ($e -lt 0.85 -or $e -gt 1.0) { throw 'editorAlpha must be between 0.85 and 1.0' }
     $meta.colors.editor = Set-CdsRgbaAlpha ([string]$meta.colors.editor) $e
   }
 
@@ -224,6 +276,16 @@ function Get-CdsStatusApi {
       if ($meta.name) { $themeName = [string]$meta.name }
     } catch { }
   }
+  $petDir = Get-CdsActivePetDir
+  $petId = if ($petDir) { Split-Path -Leaf $petDir } else { 'none' }
+  $petName = $null
+  if ($petDir -and (Test-Path (Join-Path $petDir 'theme.json'))) {
+    try {
+      $petMeta = Get-Content (Join-Path $petDir 'theme.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+      if ($petMeta.name) { $petName = [string]$petMeta.name }
+    } catch { }
+    if (-not $petName) { $petName = $petId }
+  }
   $running = $false
   $cdp = $false
   $injectorAlive = $false
@@ -274,6 +336,8 @@ function Get-CdsStatusApi {
     themeId         = $themeId
     themeName       = $themeName
     themeDir        = $themeDir
+    petId           = $petId
+    petName         = $petName
     statusTone      = $tone
     hintKey         = $hintKey
     checks          = @(
@@ -344,6 +408,54 @@ function Write-CdsHttpFile($Response, [string]$FilePath, [string]$ContentType) {
   $Response.OutputStream.Close()
 }
 
+# Serve pet PNG with magenta chroma converted to alpha (preview-safe).
+function Write-CdsHttpPetArt($Response, [string]$FilePath) {
+  if (-not (Test-Path -LiteralPath $FilePath)) {
+    $Response.StatusCode = 404
+    $Response.Close()
+    return
+  }
+  Add-Type -AssemblyName System.Drawing -ErrorAction SilentlyContinue
+  $ms = New-Object IO.MemoryStream
+  try {
+    $src = [System.Drawing.Image]::FromFile($FilePath)
+    try {
+      $bmp = New-Object System.Drawing.Bitmap $src.Width, $src.Height, ([System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
+      $g = [System.Drawing.Graphics]::FromImage($bmp)
+      $g.Clear([System.Drawing.Color]::Transparent)
+      $g.DrawImage($src, 0, 0, $src.Width, $src.Height)
+      $g.Dispose()
+
+      $w = $bmp.Width; $h = $bmp.Height
+      $rect = New-Object System.Drawing.Rectangle 0, 0, $w, $h
+      $data = $bmp.LockBits($rect, [System.Drawing.Imaging.ImageLockMode]::ReadWrite, [System.Drawing.Imaging.PixelFormat]::Format32bppArgb)
+      $stride = $data.Stride
+      $px = New-Object byte[] ($stride * $h)
+      [Runtime.InteropServices.Marshal]::Copy($data.Scan0, $px, 0, $px.Length)
+      for ($o = 0; $o + 3 -lt $px.Length; $o += 4) {
+        $b = $px[$o]; $gc = $px[$o + 1]; $r = $px[$o + 2]
+        $screen = ($r -eq 255 -and $gc -eq 0 -and $b -eq 255) -or
+          ($r -eq 0 -and $gc -eq 255 -and $b -eq 0) -or
+          ($r -ge 220 -and $b -ge 220 -and $gc -le 60) -or
+          ($gc -ge 220 -and $r -le 60 -and $b -le 60)
+        if ($screen) { $px[$o] = 0; $px[$o + 1] = 0; $px[$o + 2] = 0; $px[$o + 3] = 0 }
+      }
+      [Runtime.InteropServices.Marshal]::Copy($px, 0, $data.Scan0, $px.Length)
+      $bmp.UnlockBits($data)
+      $bmp.Save($ms, [System.Drawing.Imaging.ImageFormat]::Png)
+      $bmp.Dispose()
+    } finally { $src.Dispose() }
+    $bytes = $ms.ToArray()
+  } finally { $ms.Dispose() }
+
+  $Response.StatusCode = 200
+  $Response.ContentType = 'image/png'
+  $Response.ContentLength64 = $bytes.Length
+  $Response.Headers['Cache-Control'] = 'no-cache'
+  $Response.OutputStream.Write($bytes, 0, $bytes.Length)
+  $Response.OutputStream.Close()
+}
+
 function Get-CdsMime([string]$Path) {
   switch ([IO.Path]::GetExtension($Path).ToLowerInvariant()) {
     '.html' { 'text/html; charset=utf-8' }
@@ -374,6 +486,9 @@ function Invoke-CdsApplyApi([string]$ThemeId, [bool]$AllowRestart) {
   $themePath = Join-Path $script:CdsProjectRoot "themes\$ThemeId"
   if (-not (Test-Path -LiteralPath (Join-Path $themePath 'theme.json'))) {
     throw "Theme not found: $ThemeId"
+  }
+  if (Test-CdsThemeIsPet -ThemeDir $themePath) {
+    throw 'Desk pets are chosen separately — pick a wallpaper theme to apply the skin.'
   }
 
   Add-Log "Applying theme: $ThemeId"
@@ -435,6 +550,7 @@ function Invoke-CdsApplyApi([string]$ThemeId, [bool]$AllowRestart) {
   }
 
   Set-CdsSetupDone
+  Sync-CdsDeskPet
   $mode = 'dark'
   try {
     $meta = Get-Content (Join-Path $themePath 'theme.json') -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -445,6 +561,7 @@ function Invoke-CdsApplyApi([string]$ThemeId, [bool]$AllowRestart) {
     softVerify = [bool]($softOk -and -not $hardOk)
     themeId    = $ThemeId
     themeMode  = $mode
+    petId      = $(if (Get-CdsActivePetDir) { Split-Path -Leaf (Get-CdsActivePetDir) } else { 'none' })
     logs       = @($script:logs)
   }
 }
@@ -613,7 +730,7 @@ try {
       }
       if ($path -eq '/api/themes' -and $req.HttpMethod -eq 'GET') {
         $showHidden = ($req.Url.Query -match '(?i)[?&]showHidden=(1|true)\b')
-        Write-CdsHttpJson $res ([ordered]@{ themes = @(Get-CdsThemeListApi -ShowHidden $showHidden) })
+        Write-CdsHttpJson $res (Get-CdsThemesPayloadApi -ShowHidden $showHidden)
         continue
       }
       if ($path -eq '/api/i18n' -and $req.HttpMethod -eq 'GET') {
@@ -720,8 +837,42 @@ try {
         $metaPath = Join-Path $themeDir 'theme.json'
         if (-not (Test-Path -LiteralPath $metaPath)) { $res.StatusCode = 404; $res.Close(); continue }
         $meta = Get-Content -LiteralPath $metaPath -Raw -Encoding UTF8 | ConvertFrom-Json
-        $img = Join-Path $themeDir ([string]$meta.image)
-        Write-CdsHttpFile $res $img (Get-CdsMime $img)
+        $imgName = $null
+        $isPet = $false
+        if ($meta.pet -or (($meta.petStates) -and ([string]$meta.artMode).ToLowerInvariant() -eq 'mascot')) {
+          $isPet = $true
+        }
+        if ($meta.petStates -and $meta.petStates.idle) { $imgName = [string]$meta.petStates.idle }
+        if (-not $imgName) { $imgName = [string]$meta.image }
+        $img = Join-Path $themeDir $imgName
+        if (-not (Test-Path -LiteralPath $img)) { $res.StatusCode = 404; $res.Close(); continue }
+        if ($isPet) {
+          Write-CdsHttpPetArt $res $img
+        } else {
+          Write-CdsHttpFile $res $img (Get-CdsMime $img)
+        }
+        continue
+      }
+      if ($path -eq '/api/set-pet' -and $req.HttpMethod -eq 'POST') {
+        $body = Read-CdsHttpBody $req | ConvertFrom-Json
+        $petId = [string]$body.petId
+        if (-not $petId -or $petId -eq 'none') {
+          Set-CdsActivePet -ThemeDir 'none'
+          Stop-CdsDeskPet
+          Write-CdsHttpJson $res ([ordered]@{ ok = $true; petId = 'none'; status = (Get-CdsStatusApi) })
+          continue
+        }
+        $petDir = Resolve-CdsThemeDir -ThemeArg $petId
+        if (-not (Test-CdsThemeIsPet -ThemeDir $petDir)) {
+          throw "Not a desk pet pack: $petId"
+        }
+        Set-CdsActivePet -ThemeDir $petDir
+        Start-CdsDeskPet
+        Write-CdsHttpJson $res ([ordered]@{
+          ok     = $true
+          petId  = (Split-Path -Leaf $petDir)
+          status = (Get-CdsStatusApi)
+        })
         continue
       }
 

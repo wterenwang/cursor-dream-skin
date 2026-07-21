@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "pet-inkdot",
+  "name": "墨点",
+  "mode": "dark",
+  "flavor": "inkdot",
+  "artMode": "mascot",
+  "pet": true,
+  "image": "art.png",
+  "artFit": "contain",
+  "artPosition": "right bottom",
+  "artFilter": "none",
+  "petStates": {
+    "idle": "idle.png",
+    "working": "working.png",
+    "thinking": "thinking.png",
+    "happy": "happy.png",
+    "attention": "attention.png",
+    "sleeping": "sleeping.png",
+    "error": "error.png"
+  },
+  "mascotWidth": "min(22vw, 280px)",
+  "mascotHeight": "min(42vh, 320px)",
+  "mascotOpacity": "0.98",
+  "backdrop": "radial-gradient(ellipse at 18% 12%, rgba(59, 168, 160, 0.28), transparent 42%), linear-gradient(160deg, #121820 0%, #1a2830 48%, #10161c 100%)",
+  "decor": {
+    "statusStripe": true,
+    "activityGlow": false,
+    "sidebarBloom": true,
+    "tabPearl": true,
+    "aipaneRibbon": false,
+    "motto": "墨点待命 · 滴答一下"
+  },
+  "colors": {
+    "dim": "rgba(8, 12, 16, 0.08)",
+    "chrome": "rgba(18, 28, 34, 0.92)",
+    "sidebar": "rgba(16, 26, 32, 0.94)",
+    "editor": "rgba(14, 22, 28, 0.97)",
+    "aiPane": "rgba(18, 28, 34, 0.95)",
+    "input": "rgba(28, 44, 52, 0.96)",
+    "widget": "rgba(22, 34, 40, 0.98)",
+    "foreground": "#e8f4f2",
+    "mutedForeground": "rgba(232, 244, 242, 0.70)",
+    "accent": "#3BA8A0",
+    "line": "#3BA8A040"
+  },
+  "builtin": true,
+  "hidden": false,
+  "custom": false,
+  "featured": true,
+  "featuredOrder": 1
+}

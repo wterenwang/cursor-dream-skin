@@ -31,20 +31,18 @@
   pointer-events: none;
 }
 
-/* Mascot / atmosphere layouts — character is not a full-bleed wallpaper. */
+/* Mascot layout — character in the corner only; mood comes from backdrop, not wallpaper. */
+.cursor-dream-skin[data-cds-art-mode="mascot"] #cursor-dream-skin-art .cds-backdrop {
+  /* keep full-bleed mood wash */
+  opacity: 1;
+}
+.cursor-dream-skin[data-cds-art-mode="mascot"] #cursor-dream-skin-art .cds-dim {
+  /* no extra full-window veil over the solid backdrop */
+  background: transparent;
+}
 .cursor-dream-skin[data-cds-art-mode="mascot"] #cursor-dream-skin-art .cds-image {
-  inset: auto;
-  right: var(--cds-mascot-right, 0%);
-  bottom: var(--cds-mascot-bottom, 0%);
-  left: auto;
-  top: auto;
-  width: var(--cds-mascot-width, min(44vw, 540px));
-  height: var(--cds-mascot-height, min(82vh, 860px));
-  background-size: contain;
-  background-position: right bottom;
-  background-repeat: no-repeat;
-  opacity: var(--cds-mascot-opacity, 0.92);
-  filter: var(--cds-art-filter, none);
+  /* Character lives on the desktop pet — IDE only keeps the mood backdrop. */
+  display: none !important;
 }
 .cursor-dream-skin[data-cds-art-mode="atmosphere"] #cursor-dream-skin-art .cds-image {
   background-size: cover;
@@ -138,15 +136,18 @@
   background-color: var(--cds-sidebar) !important;
 }
 
+/* Editor surfaces: keep a solid-enough wash so glyphs stay readable over busy art.
+ * (Transparent monaco layers let wallpaper punch through behind dark Color Theme text.) */
 .cursor-dream-skin .monaco-workbench .part.editor,
 .cursor-dream-skin .monaco-workbench .part.editor .content,
-.cursor-dream-skin .monaco-workbench .part.editor .editor-container,
-.cursor-dream-skin .monaco-workbench .part.editor .monaco-editor,
-.cursor-dream-skin .monaco-workbench .part.editor .monaco-editor .monaco-editor-background,
-.cursor-dream-skin .monaco-workbench .part.editor .monaco-editor .margin {
+.cursor-dream-skin .monaco-workbench .part.editor .editor-container {
   background-color: transparent !important;
 }
-.cursor-dream-skin .monaco-workbench .part.editor .editor-group-container {
+.cursor-dream-skin .monaco-workbench .part.editor .editor-group-container,
+.cursor-dream-skin .monaco-workbench .part.editor .monaco-editor,
+.cursor-dream-skin .monaco-workbench .part.editor .monaco-editor .monaco-editor-background,
+.cursor-dream-skin .monaco-workbench .part.editor .monaco-editor .margin,
+.cursor-dream-skin .monaco-workbench .part.editor .monaco-editor .inputarea.ime-input {
   background-color: var(--cds-editor) !important;
 }
 .cursor-dream-skin .monaco-workbench .part.editor .editor-group-container > .title {
@@ -166,7 +167,7 @@
 .cursor-dream-skin .monaco-workbench .part.editor .gettingStartedContainer,
 .cursor-dream-skin .monaco-workbench .part.editor .settings-editor,
 .cursor-dream-skin .monaco-workbench .part.editor .welcome-view {
-  background-color: transparent !important;
+  background-color: var(--cds-editor) !important;
 }
 
 .cursor-dream-skin .monaco-workbench .part.auxiliarybar {
@@ -257,6 +258,31 @@
 .cursor-dream-skin .monaco-workbench .part.sidebar,
 .cursor-dream-skin .monaco-workbench .part.auxiliarybar {
   box-shadow: inset 0 0 0 1px var(--cds-line, transparent);
+}
+
+/* ---- readability: dark skin + mismatched Color Theme -------------------
+ * Cursor Color Theme may still paint dark glyphs; wallpaper then wins.
+ * Keep panels denser via theme alphas, and force light ink on key surfaces. */
+.cursor-dream-skin[data-cds-mode="dark"] .monaco-workbench .part.sidebar,
+.cursor-dream-skin[data-cds-mode="dark"] .monaco-workbench .part.sidebar .monaco-icon-label,
+.cursor-dream-skin[data-cds-mode="dark"] .monaco-workbench .part.sidebar .label-name,
+.cursor-dream-skin[data-cds-mode="dark"] .monaco-workbench .part.sidebar .monaco-list-row,
+.cursor-dream-skin[data-cds-mode="dark"] .monaco-workbench .part.activitybar,
+.cursor-dream-skin[data-cds-mode="dark"] .monaco-workbench .part.statusbar,
+.cursor-dream-skin[data-cds-mode="dark"] .monaco-workbench .part.auxiliarybar {
+  color: var(--cds-fg, #f4f1ec) !important;
+}
+
+.cursor-dream-skin[data-cds-mode="dark"] .monaco-workbench .part.editor .monaco-editor .view-lines,
+.cursor-dream-skin[data-cds-mode="dark"] .monaco-workbench .part.editor .monaco-editor .view-line,
+.cursor-dream-skin[data-cds-mode="dark"] .monaco-workbench .part.editor .monaco-editor .view-line span[class^="mtk"] {
+  color: var(--cds-fg, #f4f1ec) !important;
+  -webkit-text-fill-color: var(--cds-fg, #f4f1ec) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.55);
+}
+
+.cursor-dream-skin[data-cds-mode="dark"] .monaco-workbench .part.editor .monaco-editor .margin-view-overlays .line-numbers {
+  color: var(--cds-muted, rgba(244, 241, 236, 0.72)) !important;
 }
 
 /* ---- chat / markdown code blocks (readability) --------------------------

@@ -1,4 +1,4 @@
-# Cursor Dream Skin — shared Windows helpers.
+﻿# Cursor Dream Skin — shared Windows helpers.
 # Inspired by Fei-Away/Codex-Dream-Skin (Windows) and KinGao294/cursor-dream-skin (Cursor CDP).
 
 $ErrorActionPreference = 'Stop'
@@ -8,11 +8,12 @@ $script:CdsInjector = Join-Path $PSScriptRoot 'injector.mjs'
 $script:CdsStateRoot = Join-Path $env:LOCALAPPDATA 'CursorDreamSkin'
 $script:CdsStatePath = Join-Path $script:CdsStateRoot 'state.json'
 $script:CdsActiveThemePath = Join-Path $script:CdsStateRoot 'active-theme.txt'
+$script:CdsActivePetPath = Join-Path $script:CdsStateRoot 'active-pet.txt'
 $script:CdsInjectorLog = Join-Path $script:CdsStateRoot 'injector.log'
 $script:CdsInjectorErrorLog = Join-Path $script:CdsStateRoot 'injector-error.log'
 $script:CdsAppLog = Join-Path $script:CdsStateRoot 'cursor-launch.log'
 $script:CdsDefaultPort = 9666
-$script:CdsSkinVersion = '1.1.0-win'
+$script:CdsSkinVersion = '1.2.0-win'
 $script:CdsCursorExeFile = Join-Path $script:CdsStateRoot 'cursor-exe.txt'
 $script:CdsSetupDoneFile = Join-Path $script:CdsStateRoot 'setup-done.txt'
 
@@ -364,7 +365,18 @@ function Write-CdsState {
 function Get-CdsActiveThemeDir {
   if (Test-Path -LiteralPath $script:CdsActiveThemePath) {
     $path = (Get-Content -LiteralPath $script:CdsActiveThemePath -Raw -Encoding UTF8).Trim()
-    if ($path -and (Test-Path -LiteralPath (Join-Path $path 'theme.json'))) { return $path }
+    if ($path -and (Test-Path -LiteralPath (Join-Path $path 'theme.json'))) {
+      if (Test-CdsThemeIsPet -ThemeDir $path) {
+        # Migrate: pets used to live in active-theme; keep wallpaper separate.
+        if (-not (Get-CdsActivePetDir)) { Set-CdsActivePet -ThemeDir $path }
+        $wall = Get-CdsFeaturedDefaultThemeDir
+        if ($wall) {
+          Set-Content -LiteralPath $script:CdsActiveThemePath -Value $wall -Encoding UTF8
+          return $wall
+        }
+      }
+      return $path
+    }
   }
   $default = Join-Path $script:CdsProjectRoot 'themes\default'
   if (Test-Path -LiteralPath (Join-Path $default 'theme.json')) { return $default }
@@ -379,6 +391,44 @@ function Set-CdsActiveTheme {
   }
   Ensure-CdsStateRoot
   Set-Content -LiteralPath $script:CdsActiveThemePath -Value $resolved -Encoding UTF8
+}
+
+function Test-CdsThemeIsPet {
+  param([string]$ThemeDir)
+  if (-not $ThemeDir) { return $false }
+  $jsonPath = Join-Path $ThemeDir 'theme.json'
+  if (-not (Test-Path -LiteralPath $jsonPath)) { return $false }
+  try {
+    $meta = Get-Content -LiteralPath $jsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($meta.pet) { return $true }
+    return ([string]$meta.artMode).ToLowerInvariant() -eq 'mascot' -and $meta.petStates
+  } catch { return $false }
+}
+
+function Get-CdsActivePetDir {
+  if (Test-Path -LiteralPath $script:CdsActivePetPath) {
+    $path = (Get-Content -LiteralPath $script:CdsActivePetPath -Raw -Encoding UTF8).Trim()
+    if ($path -eq '' -or $path -eq 'none') { return $null }
+    if (Test-Path -LiteralPath (Join-Path $path 'theme.json')) { return $path }
+    # allow id
+    $byId = Join-Path $script:CdsProjectRoot "themes\$path"
+    if (Test-Path -LiteralPath (Join-Path $byId 'theme.json')) { return (Resolve-Path -LiteralPath $byId).Path }
+  }
+  return $null
+}
+
+function Set-CdsActivePet {
+  param([string]$ThemeDir)
+  Ensure-CdsStateRoot
+  if (-not $ThemeDir -or $ThemeDir -eq 'none') {
+    Set-Content -LiteralPath $script:CdsActivePetPath -Value 'none' -Encoding UTF8
+    return
+  }
+  $resolved = (Resolve-Path -LiteralPath $ThemeDir).Path
+  if (-not (Test-Path -LiteralPath (Join-Path $resolved 'theme.json'))) {
+    Write-CdsFail "Not a pet theme directory: $resolved"
+  }
+  Set-Content -LiteralPath $script:CdsActivePetPath -Value $resolved -Encoding UTF8
 }
 
 function Resolve-CdsThemeDir {
@@ -396,6 +446,88 @@ function Resolve-CdsThemeDir {
     return (Resolve-Path -LiteralPath $byId).Path
   }
   Write-CdsFail "Theme not found: $ThemeArg"
+}
+
+function Get-CdsCatalog {
+  $path = Join-Path $script:CdsProjectRoot 'themes\catalog.json'
+  if (-not (Test-Path -LiteralPath $path)) {
+    return [pscustomobject]@{
+      schemaVersion   = 1
+      featuredDefault = 'default'
+      featured        = @([pscustomobject]@{ id = 'default' })
+    }
+  }
+  $utf8 = New-Object System.Text.UTF8Encoding $false
+  $raw = [IO.File]::ReadAllText($path, $utf8)
+  if ($raw.Length -gt 0 -and [int][char]$raw[0] -eq 0xFEFF) { $raw = $raw.Substring(1) }
+  return ($raw | ConvertFrom-Json)
+}
+
+function Get-CdsFeaturedDefaultThemeDir {
+  $cat = Get-CdsCatalog
+  $id = [string]$cat.featuredDefault
+  if (-not $id) { $id = 'default' }
+  $dir = Join-Path $script:CdsProjectRoot "themes\$id"
+  if ((Test-Path -LiteralPath (Join-Path $dir 'theme.json')) -and -not (Test-CdsThemeIsPet -ThemeDir $dir)) {
+    return (Resolve-Path -LiteralPath $dir).Path
+  }
+  $fallback = Join-Path $script:CdsProjectRoot 'themes\default'
+  if (Test-Path -LiteralPath (Join-Path $fallback 'theme.json')) { return (Resolve-Path -LiteralPath $fallback).Path }
+  return $null
+}
+
+function Get-CdsFeaturedDefaultPetDir {
+  $cat = Get-CdsCatalog
+  $id = [string]$cat.featuredDefaultPet
+  if (-not $id) { $id = 'pet-spark' }
+  if ($id -eq 'none') { return $null }
+  $dir = Join-Path $script:CdsProjectRoot "themes\$id"
+  if ((Test-Path -LiteralPath (Join-Path $dir 'theme.json')) -and (Test-CdsThemeIsPet -ThemeDir $dir)) {
+    return (Resolve-Path -LiteralPath $dir).Path
+  }
+  $fallback = Join-Path $script:CdsProjectRoot 'themes\pet-spark'
+  if (Test-Path -LiteralPath (Join-Path $fallback 'theme.json')) { return (Resolve-Path -LiteralPath $fallback).Path }
+  return $null
+}
+
+function Get-CdsFeaturedThemeEntries {
+  param([ValidateSet('all', 'wallpaper', 'pet')]$Kind = 'all')
+  $cat = Get-CdsCatalog
+  $lang = 'zh'
+  $langFile = Join-Path $script:CdsStateRoot 'ui-lang.txt'
+  if (Test-Path -LiteralPath $langFile) {
+    $v = (Get-Content -LiteralPath $langFile -Raw -Encoding ASCII).Trim().ToLowerInvariant()
+    if ($v -eq 'en' -or $v -eq 'zh') { $lang = $v }
+  }
+  $list = @()
+  foreach ($item in @($cat.featured)) {
+    $id = [string]$item.id
+    if (-not $id) { continue }
+    $dir = Join-Path $script:CdsProjectRoot "themes\$id"
+    $jsonPath = Join-Path $dir 'theme.json'
+    if (-not (Test-Path -LiteralPath $jsonPath)) { continue }
+    $isPet = Test-CdsThemeIsPet -ThemeDir $dir
+    if ($Kind -eq 'wallpaper' -and $isPet) { continue }
+    if ($Kind -eq 'pet' -and -not $isPet) { continue }
+    $name = $id
+    try {
+      $meta = Get-Content -LiteralPath $jsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
+      if ($meta.name) { $name = [string]$meta.name }
+    } catch { }
+    $blurb = $null
+    if ($item.blurb) {
+      if ($lang -eq 'en' -and $item.blurb.en) { $blurb = [string]$item.blurb.en }
+      elseif ($item.blurb.zh) { $blurb = [string]$item.blurb.zh }
+    }
+    $list += [pscustomobject]@{
+      id    = $id
+      name  = $name
+      blurb = $blurb
+      pet   = $isPet
+      path  = (Resolve-Path -LiteralPath $dir).Path
+    }
+  }
+  return @($list)
 }
 
 function Stop-CdsRecordedInjector {
@@ -504,10 +636,10 @@ function Start-CdsCursorWithCdp {
 
 function Confirm-CdsRestartDialog {
   Write-Host ''
-  Write-Host 'Cursor needs a one-time restart to enable Dream Skin.' -ForegroundColor Yellow
-  Write-Host '(Open windows/files are kept, but the current Agent chat will interrupt.)'
+  Write-Host '需要重启一次 Cursor，皮肤才能出现。' -ForegroundColor Yellow
+  Write-Host '（已打开的窗口和文件会保留，当前 Agent 对话会暂停。）'
   Write-Host ''
-  Write-Host -NoNewline 'Restart and apply skin now? [Y/N] '
+  Write-Host -NoNewline '现在重启并应用皮肤吗？ [Y/N] '
   $answer = Read-Host
   if ($answer -match '^(y|yes|Y)$') { return $true }
   return $false
@@ -524,3 +656,64 @@ function Pause-CdsIfInteractive {
   }
 }
 
+function Test-CdsThemeIsMascot {
+  param([string]$ThemeDir)
+  if (-not $ThemeDir) { $ThemeDir = Get-CdsActiveThemeDir }
+  if (-not $ThemeDir) { return $false }
+  $jsonPath = Join-Path $ThemeDir 'theme.json'
+  if (-not (Test-Path -LiteralPath $jsonPath)) { return $false }
+  try {
+    $meta = Get-Content -LiteralPath $jsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    return ([string]$meta.artMode).ToLowerInvariant() -eq 'mascot'
+  } catch { return $false }
+}
+
+function Test-CdsDeskPetRunning {
+  $pidFile = Join-Path $script:CdsStateRoot 'deskpet.pid'
+  if (-not (Test-Path -LiteralPath $pidFile)) { return $false }
+  $raw = (Get-Content -LiteralPath $pidFile -Raw -Encoding ASCII).Trim()
+  $petPid = 0
+  if (-not [int]::TryParse($raw, [ref]$petPid)) { return $false }
+  $p = Get-Process -Id $petPid -ErrorAction SilentlyContinue
+  return [bool]$p
+}
+
+function Start-CdsDeskPet {
+  if (Test-CdsDeskPetRunning) { return }
+  $vbs = Join-Path $PSScriptRoot 'launch-deskpet.vbs'
+  if (-not (Test-Path -LiteralPath $vbs)) { return }
+  Start-Process -FilePath 'wscript.exe' -ArgumentList "`"$vbs`"" | Out-Null
+}
+
+function Stop-CdsDeskPet {
+  $pidFile = Join-Path $script:CdsStateRoot 'deskpet.pid'
+  if (Test-Path -LiteralPath $pidFile) {
+    $raw = (Get-Content -LiteralPath $pidFile -Raw -Encoding ASCII).Trim()
+    $petPid = 0
+    if ([int]::TryParse($raw, [ref]$petPid)) {
+      Stop-Process -Id $petPid -Force -ErrorAction SilentlyContinue
+    }
+    Remove-Item -LiteralPath $pidFile -Force -ErrorAction SilentlyContinue
+  }
+  Get-CimInstance Win32_Process -Filter "Name='powershell.exe'" -ErrorAction SilentlyContinue |
+    Where-Object { $_.CommandLine -and ($_.CommandLine -like '*deskpet-dream-skin.ps1*') } |
+    ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }
+}
+
+function Sync-CdsDeskPetForTheme {
+  param([string]$ThemeDir)
+  # Prefer dedicated active pet; fall back to theme only if it is a pet pack.
+  $petDir = Get-CdsActivePetDir
+  if (-not $petDir -and $ThemeDir -and (Test-CdsThemeIsPet -ThemeDir $ThemeDir)) {
+    $petDir = $ThemeDir
+    Set-CdsActivePet -ThemeDir $petDir
+  }
+  if ($petDir) {
+    Start-CdsDeskPet
+  }
+}
+
+function Sync-CdsDeskPet {
+  $petDir = Get-CdsActivePetDir
+  if ($petDir) { Start-CdsDeskPet } else { Stop-CdsDeskPet }
+}

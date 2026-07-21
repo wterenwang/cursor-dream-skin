@@ -30,6 +30,7 @@ if (-not $resolvedPort) { $resolvedPort = $script:CdsDefaultPort }
 
 if (-not (Test-CdsCdpHttpReady -Port $resolvedPort)) {
   Write-Host "Theme `"$(Split-Path -Leaf $themeDir)`" recorded. No live skin session on port $resolvedPort — it will apply on the next start-dream-skin.ps1."
+  Sync-CdsDeskPetForTheme -ThemeDir $themeDir
   exit 0
 }
 
@@ -60,3 +61,5 @@ if ($verify.ExitCode -eq 0) {
 } else {
   Write-Host "Theme `"$name`" injected but verification was soft; check verify-dream-skin.ps1 if it looks off."
 }
+
+Sync-CdsDeskPetForTheme -ThemeDir $themeDir

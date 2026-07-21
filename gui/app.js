@@ -5,10 +5,12 @@
     lang: "zh",
     i18n: null,
     themes: [],
+    pets: [],
     busy: false,
     status: null,
     wizardOpen: false,
     showHidden: false,
+    previewMode: "theme",
   };
 
   const $ = (id) => document.getElementById(id);
@@ -64,7 +66,7 @@
   function setBusy(busy) {
     state.busy = busy;
     [
-      "btn-apply", "btn-restore", "btn-refresh", "theme-select",
+      "btn-apply", "btn-restore", "btn-refresh", "theme-select", "pet-select",
       "btn-en", "btn-zh", "btn-create", "btn-pick", "btn-open-themes",
       "custom-name", "custom-mode", "btn-change-cursor",
       "wizard-browse", "wizard-continue", "wizard-path",
@@ -130,7 +132,9 @@
     $("meta-cursor").textContent = s.cursorExe || t("cursorMissing");
     $("meta-cursor").title = s.cursorExe || "";
     $("meta-theme").textContent = s.themeName || t("none");
-    $("meta-port").textContent = String(s.port ?? "-");
+    $("meta-pet").textContent = s.petName || t("petNone");
+    $("meta-port").textContent = s.cdpReady ? t("linkReady") : t("linkOff");
+    $("meta-port").title = s.port != null ? String(s.port) : "";
 
     $("btn-apply").disabled = state.busy || !found;
   }
@@ -158,21 +162,54 @@
     themes.forEach((theme) => {
       const opt = document.createElement("option");
       opt.value = theme.id;
-      const tag = theme.hidden ? " · dev" : (theme.custom ? " · custom" : "");
-      opt.textContent = `${theme.name}  -  ${theme.id}${tag}`;
+      const tag = theme.featured
+        ? " ★"
+        : (theme.hidden ? t("tagTest") : (theme.custom ? t("tagCustom") : ""));
+      opt.textContent = `${theme.name}${tag}`;
+      opt.title = theme.id;
       if (theme.id === activeId || theme.id === prev) opt.selected = true;
       sel.appendChild(opt);
     });
     if (activeId && [...sel.options].some((o) => o.value === activeId)) {
       sel.value = activeId;
     }
-    updatePreview();
     syncTuneFromSelected();
+    if (state.previewMode === "theme") updatePreview();
+  }
+
+  function renderPets(pets, activeId) {
+    state.pets = pets || [];
+    const sel = $("pet-select");
+    if (!sel) return;
+    const prev = sel.value;
+    sel.innerHTML = "";
+    const none = document.createElement("option");
+    none.value = "none";
+    none.textContent = t("petNone");
+    sel.appendChild(none);
+    state.pets.forEach((pet) => {
+      const opt = document.createElement("option");
+      opt.value = pet.id;
+      const tag = pet.featured ? " ★" : "";
+      opt.textContent = `${pet.name}${tag}`;
+      opt.title = pet.id;
+      sel.appendChild(opt);
+    });
+    const want = activeId || prev || "none";
+    if ([...sel.options].some((o) => o.value === want)) sel.value = want;
+    else sel.value = "none";
+    if (state.previewMode === "pet") updatePreview();
   }
 
   function selectedTheme() {
     const id = $("theme-select").value;
     return state.themes.find((x) => x.id === id) || null;
+  }
+
+  function selectedPet() {
+    const id = $("pet-select")?.value;
+    if (!id || id === "none") return null;
+    return state.pets.find((x) => x.id === id) || null;
   }
 
   function syncTuneFromSelected() {
@@ -185,7 +222,7 @@
     const dim = Math.round((theme.dimAlpha ?? 0.2) * 100);
     const ed = Math.round((theme.editorAlpha ?? 0.9) * 100);
     $("tune-dim").value = String(Math.max(0, Math.min(60, dim)));
-    $("tune-editor").value = String(Math.max(50, Math.min(100, ed)));
+    $("tune-editor").value = String(Math.max(85, Math.min(100, ed)));
     $("tune-dim-val").textContent = (Number($("tune-dim").value) / 100).toFixed(2);
     $("tune-editor-val").textContent = (Number($("tune-editor").value) / 100).toFixed(2);
     const pos = theme.artPosition || "center";
@@ -201,21 +238,40 @@
   }
 
   function updatePreview() {
-    const id = $("theme-select").value;
-    const theme = state.themes.find((x) => x.id === id);
     const img = $("preview-img");
     const cap = $("preview-cap");
     const box = $("preview");
-    if (!theme) {
+    let id = null;
+    let name = null;
+    let isPet = false;
+    if (state.previewMode === "pet") {
+      const pet = selectedPet();
+      if (pet) {
+        id = pet.id;
+        name = pet.name;
+        isPet = true;
+      }
+    }
+    if (!id) {
+      const theme = selectedTheme();
+      if (theme) {
+        id = theme.id;
+        name = theme.name;
+        state.previewMode = "theme";
+        isPet = Boolean(theme.pet);
+      }
+    }
+    box.classList.toggle("is-pet", isPet);
+    if (!id) {
       img.hidden = true;
       box.classList.remove("has-art");
       cap.textContent = t("previewEmpty");
       return;
     }
-    img.src = `/api/theme-art/${encodeURIComponent(theme.id)}?t=${Date.now()}`;
+    img.src = `/api/theme-art/${encodeURIComponent(id)}?t=${Date.now()}`;
     img.hidden = false;
     box.classList.add("has-art");
-    cap.textContent = theme.name;
+    cap.textContent = name;
     img.onerror = () => {
       img.hidden = true;
       box.classList.remove("has-art");
@@ -246,8 +302,37 @@
     if (status.lang) state.lang = status.lang;
     applyI18n();
     renderStatus(status);
-    renderThemes(themesPayload.themes || [], status.themeId);
+    renderThemes(
+      themesPayload.themes || [],
+      status.themeId || themesPayload.featuredDefault
+    );
+    renderPets(
+      themesPayload.pets || [],
+      status.petId || themesPayload.activePet || themesPayload.featuredDefaultPet || "none"
+    );
+    if (status.petId && status.petId !== "none") state.previewMode = "pet";
+    else state.previewMode = "theme";
+    updatePreview();
     maybeShowWizard(status);
+  }
+
+  async function onPetChange() {
+    const petId = $("pet-select").value || "none";
+    state.previewMode = "pet";
+    updatePreview();
+    setBusy(true);
+    try {
+      const result = await api("/api/set-pet", {
+        method: "POST",
+        body: JSON.stringify({ petId }),
+      });
+      if (result.status) renderStatus(result.status);
+      log(petId === "none" ? t("petHidden") : tf("petApplied", selectedPet()?.name || petId), "ok");
+    } catch (err) {
+      log(err.message || String(err), "error");
+    } finally {
+      setBusy(false);
+    }
   }
 
   async function setLang(lang) {
@@ -511,9 +596,11 @@
   $("btn-apply").addEventListener("click", onApply);
   $("btn-restore").addEventListener("click", onRestore);
   $("theme-select").addEventListener("change", () => {
+    state.previewMode = "theme";
     updatePreview();
     syncTuneFromSelected();
   });
+  $("pet-select").addEventListener("change", () => { onPetChange(); });
   $("tune-dim").addEventListener("input", () => {
     $("tune-dim-val").textContent = (Number($("tune-dim").value) / 100).toFixed(2);
   });

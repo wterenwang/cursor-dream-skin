@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "id": "pet-byte",
+  "name": "电波",
+  "mode": "dark",
+  "flavor": "byte",
+  "artMode": "mascot",
+  "pet": true,
+  "image": "art.png",
+  "artFit": "contain",
+  "artPosition": "right bottom",
+  "artFilter": "none",
+  "petStates": {
+    "idle": "idle.png",
+    "working": "working.png",
+    "thinking": "thinking.png",
+    "happy": "happy.png",
+    "attention": "attention.png",
+    "sleeping": "sleeping.png",
+    "error": "error.png"
+  },
+  "mascotWidth": "min(22vw, 280px)",
+  "mascotHeight": "min(42vh, 320px)",
+  "mascotOpacity": "0.98",
+  "backdrop": "radial-gradient(ellipse at 22% 10%, rgba(180, 90, 200, 0.28), transparent 44%), linear-gradient(165deg, #16121e 0%, #221830 50%, #120e18 100%)",
+  "decor": {
+    "statusStripe": true,
+    "activityGlow": true,
+    "sidebarBloom": true,
+    "tabPearl": true,
+    "aipaneRibbon": true,
+    "motto": "电波接通 · 随时接线"
+  },
+  "colors": {
+    "dim": "rgba(10, 8, 16, 0.08)",
+    "chrome": "rgba(28, 22, 40, 0.92)",
+    "sidebar": "rgba(24, 18, 36, 0.94)",
+    "editor": "rgba(20, 14, 30, 0.97)",
+    "aiPane": "rgba(28, 20, 40, 0.95)",
+    "input": "rgba(42, 30, 58, 0.96)",
+    "widget": "rgba(32, 24, 46, 0.98)",
+    "foreground": "#f2eaf8",
+    "mutedForeground": "rgba(242, 234, 248, 0.70)",
+    "accent": "#D46BB8",
+    "line": "#D46BB840"
+  },
+  "builtin": true,
+  "hidden": false,
+  "custom": false,
+  "featured": true,
+  "featuredOrder": 2
+}

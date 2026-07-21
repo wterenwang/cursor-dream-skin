@@ -5,13 +5,13 @@
     "mode":  "dark",
     "flavor":  "tea-host",
     "artMode":  "mascot",
-    "image": "art.jpg",
+    "image":  "art.jpg",
     "artFit":  "contain",
     "artPosition":  "right bottom",
     "artFilter":  "none",
-    "mascotWidth":  "min(40vw, 500px)",
-    "mascotHeight":  "min(78vh, 820px)",
-    "mascotOpacity":  "0.93",
+    "mascotWidth":  "min(26vw, 320px)",
+    "mascotHeight":  "min(58vh, 560px)",
+    "mascotOpacity":  "0.95",
     "backdrop":  "radial-gradient(ellipse at 20% 0%, rgba(212, 150, 96, 0.28), transparent 46%), linear-gradient(168deg, #1c1612 0%, #2a211a 50%, #181410 100%)",
     "decor":  {
                   "statusStripe":  true,
@@ -22,19 +22,20 @@
                   "motto":  "茶已温好 · 慢慢写"
               },
     "colors":  {
-                   "dim":  "rgba(12, 8, 6, 0.25)",
-                   "chrome":  "rgba(36, 28, 22, 0.80)",
-                   "sidebar":  "rgba(30, 24, 18, 0.64)",
-                   "editor":  "rgba(26, 20, 16, 0.88)",
-                   "aiPane":  "rgba(34, 26, 20, 0.74)",
-                   "input":  "rgba(48, 36, 28, 0.94)",
-                   "widget":  "rgba(38, 30, 24, 0.97)",
+                   "dim":  "rgba(12, 8, 6, 0.08)",
+                   "chrome":  "rgba(36, 28, 22, 0.92)",
+                   "sidebar":  "rgba(30, 24, 18, 0.94)",
+                   "editor":  "rgba(26, 20, 16, 0.97)",
+                   "aiPane":  "rgba(34, 26, 20, 0.95)",
+                   "input":  "rgba(48, 36, 28, 0.96)",
+                   "widget":  "rgba(38, 30, 24, 0.98)",
                    "foreground":  "#f6efe6",
                    "mutedForeground":  "rgba(246, 239, 230, 0.70)",
                    "accent":  "#d49a60",
                    "line":  "#d49a6040"
                },
     "builtin":  true,
-    "hidden":  false,
-    "custom":  false
+    "hidden":  true,
+    "custom":  false,
+    "featured":  false
 }

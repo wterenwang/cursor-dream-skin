@@ -162,9 +162,9 @@
     `--cds-art-position: ${THEME.artPosition}`,
     `--cds-art-filter: ${THEME.artFilter}`,
     `--cds-backdrop: ${THEME.backdrop || "transparent"}`,
-    `--cds-mascot-width: ${THEME.mascotWidth || "min(44vw, 540px)"}`,
-    `--cds-mascot-height: ${THEME.mascotHeight || "min(82vh, 860px)"}`,
-    `--cds-mascot-opacity: ${THEME.mascotOpacity || "0.92"}`,
+    `--cds-mascot-width: ${THEME.mascotWidth || "min(26vw, 320px)"}`,
+    `--cds-mascot-height: ${THEME.mascotHeight || "min(58vh, 560px)"}`,
+    `--cds-mascot-opacity: ${THEME.mascotOpacity || "0.95"}`,
     `--cds-motto: ${mottoCss}`,
   ].join("; ");
 
@@ -191,7 +191,12 @@
   image.style.backgroundImage = `url(${JSON.stringify(ART_DATA_URL)})`;
   const dim = document.createElement("div");
   dim.className = "cds-dim";
-  art.append(backdrop, image, dim);
+  // Wallpaper: art under dim. Mascot: solid backdrop + dim, character on top (never a full-bleed wallpaper).
+  if (artMode === "mascot") {
+    art.append(backdrop, dim, image);
+  } else {
+    art.append(backdrop, image, dim);
+  }
   document.body.prepend(art);
   html.classList.add(ROOT_CLASS);
 
